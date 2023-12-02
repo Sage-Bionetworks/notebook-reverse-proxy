@@ -5,9 +5,12 @@
 # AWS_REGION
 # SERVICE_CATALOG_PREFIX - prefix to use for service catalog synapse cred' name in SSM Parameter store
 # SSM_PARAMETER_SUFFIX - suffix for the SSM Parameter name
+# NOTEBOOK_HOST - name of the host running the notebook, as seen on the Docker network
 
 # Inject EC2_INSTANCE_ID into proxy.conf:
 sed -i "s/EC2_INSTANCE_ID/$EC2_INSTANCE_ID/g" /etc/apache2/sites-available/proxy.conf
+# Inject remote host name into proxy.conf
+sed -i "s/NOTEBOOK_HOST/$NOTEBOOK_HOST/g" /etc/apache2/sites-available/proxy.conf
 
 # access.py needs these environment variables in Apache
 echo "export EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> /etc/apache2/envvars

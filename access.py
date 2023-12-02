@@ -18,28 +18,35 @@ import os
 from mod_python import apache
 
 #TODO Enable writing to SSM Parameter store
-STORE_TO_SSM=False
+CONNECT_TO_AWS=False
 
 ssm_parameter_name_env_var = 'SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME'
 kms_alias_env_var = 'KMS_KEY_ALIAS'
 
 def headerparserhandler(req):
   req.log_error("Entering handler")
-  jwt_str = req.headers_in['x-amzn-oidc-data'] #proxy.conf ensures this header exists
+  
+  # TODO remove temp code
+  if req.headers_in.get('x-amzn-oidc-data') is not None:
+  	return apache.OK
+  else:
+  	return apache.HTTP_UNAUTHORIZED
+  # TODO end temp code
 
   try:
+    jwt_str = req.headers_in['x-amzn-oidc-data'] #proxy.conf ensures this header exists
     payload = jwt_payload(jwt_str)
     req.log_error("Got JWT payload")
 
     if payload['userid'] == approved_user() and payload['exp'] > time.time():
-    if STORE_TO_SSM:
+      if CONNECT_TO_AWS:
       	store_to_ssm(req.headers_in['x-amzn-oidc-accesstoken'])
-      req.log_error("Saved access token")
+      	req.log_error("Saved access token")
       return apache.OK
     else:
       return apache.HTTP_UNAUTHORIZED #the userid claim does not match the userid tag
   except Exception:
-    # if the JWT payload is invalid
+    # if the JWT is missing or payload is invalid
     return apache.HTTP_UNAUTHORIZED
 
 def approved_user():
