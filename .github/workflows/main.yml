@@ -34,11 +34,11 @@ jobs:
     uses: "./.github/workflows/docker_build.yml"
     secrets: inherit
     with:
-      CONTEXT_NOTEBOOK_TYPE: jupyter
+      NOTEBOOK_TYPE: jupyter
 
   docker-deploy-rstudio:
     needs: [tests]
     uses: "./.github/workflows/docker_build.yml"
     secrets: inherit
     with:
-      CONTEXT_NOTEBOOK_TYPE: rstudio
+      NOTEBOOK_TYPE: rstudio

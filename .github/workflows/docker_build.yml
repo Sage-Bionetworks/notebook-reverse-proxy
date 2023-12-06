@@ -3,13 +3,13 @@ name: Create and publish a Docker image
 on:
   workflow_call:
     inputs:
-      CONTEXT_NOTEBOOK_TYPE:
+      NOTEBOOK_TYPE:
         required: true
         type: string
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PATH: ghcr.io/${{ github.repository }}-${{ env.CONTEXT_NOTEBOOK_TYPE }}
+  IMAGE_PATH: ghcr.io/${{ github.repository }}-${{ inputs.NOTEBOOK_TYPE }}
 
 jobs:
   build-and-push-image:
@@ -40,7 +40,7 @@ jobs:
         uses: docker/build-push-action@v3.2.0
         with:
           context: .
-          build-args: notebook_type=${{ env.CONTEXT_NOTEBOOK_TYPE }}
+          build-args: notebook_type=${{ inputs.NOTEBOOK_TYPE }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
