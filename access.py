@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-## 
+##
 ## Expects these envionmental variables
 ## AWS_REGION
 ## EC2_INSTANCE_ID
@@ -22,7 +22,7 @@ kms_alias_env_var = 'KMS_KEY_ALIAS'
 
 def headerparserhandler(req):
   req.log_error("Entering handler")
-  
+
   try:
     jwt_str = req.headers_in['x-amzn-oidc-data'] #proxy.conf ensures this header exists
     payload = jwt_payload(jwt_str)
