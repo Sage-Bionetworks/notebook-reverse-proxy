@@ -1,4 +1,6 @@
 FROM ubuntu
+# notebook_type is jupyter or rstudio
+ARG notebook_type=jupyter
 
 # Update the repository sources list
 RUN apt-get update
@@ -13,7 +15,7 @@ RUN pip install jwt requests boto3
 COPY access.py /usr/lib/cgi-bin/access.py
 
 # Add config for local rev proxy to internal port
-COPY proxy.conf /etc/apache2/sites-available/proxy.conf
+COPY ${notebook_type}_proxy.conf /etc/apache2/sites-available/proxy.conf
 
 # Enable modules
 RUN a2enmod ssl proxy proxy_http proxy_wstunnel rewrite python headers

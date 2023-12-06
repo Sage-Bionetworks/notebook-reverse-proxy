@@ -17,31 +17,20 @@ import os
 
 from mod_python import apache
 
-#TODO Enable writing to SSM Parameter store
-CONNECT_TO_AWS=False
-
 ssm_parameter_name_env_var = 'SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME'
 kms_alias_env_var = 'KMS_KEY_ALIAS'
 
 def headerparserhandler(req):
   req.log_error("Entering handler")
   
-  # TODO remove temp code
-  if req.headers_in.get('x-amzn-oidc-data') is not None:
-  	return apache.OK
-  else:
-  	return apache.HTTP_UNAUTHORIZED
-  # TODO end temp code
-
   try:
     jwt_str = req.headers_in['x-amzn-oidc-data'] #proxy.conf ensures this header exists
     payload = jwt_payload(jwt_str)
-    req.log_error("Got JWT payload")
+    req.log_error(f"Got JWT payload. userid: {payload['userid']}")
 
     if payload['userid'] == approved_user() and payload['exp'] > time.time():
-      if CONNECT_TO_AWS:
-      	store_to_ssm(req.headers_in['x-amzn-oidc-accesstoken'])
-      	req.log_error("Saved access token")
+      store_to_ssm(req.headers_in['x-amzn-oidc-accesstoken'])
+      req.log_error("Saved access token")
       return apache.OK
     else:
       return apache.HTTP_UNAUTHORIZED #the userid claim does not match the userid tag
@@ -56,6 +45,7 @@ def approved_user():
   for tags in vm.tags:
     if tags["Key"] == 'Protected/AccessApprovedCaller':
       approved_caller = tags["Value"]
+      req.log_error(f"approved_caller: ${approved_caller}")
 
   return approved_caller.split(':')[1] #return userid portion of tag
 
