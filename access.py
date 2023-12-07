@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+
 ##
-## Expects these environmen variables:
+## Expects these environment variables:
 ## SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME
 ## KMS_KEY_ALIAS
 ## AWS_REGION
