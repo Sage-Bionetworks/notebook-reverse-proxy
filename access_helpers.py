@@ -13,7 +13,6 @@ import requests
 import base64
 import json
 import boto3
-import time
 import functools
 import os
 
