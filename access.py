@@ -34,10 +34,10 @@ def headerparserhandler(req):
         raise RuntimeError(f"Request lacks {AMZN_OIDC_HEADER_NAME} header.")
     jwt_str = req.headers_in[AMZN_OIDC_HEADER_NAME] # proxy.conf ensures this header exists
     req.log_error(f"jwt_str: {jwt_str}")
-    payload = jwt_payload(jwt_str)
+    payload = jwt_payload(jwt_str, req)
     req.log_error(f"userid: {payload['userid']}")
 
-    if payload['userid'] == approved_user() and payload['exp'] > time.time():
+    if payload['userid'] == approved_user(req) and payload['exp'] > time.time():
       store_to_ssm(req.headers_in['x-amzn-oidc-accesstoken'])
       req.log_error("Saved access token")
       return apache.OK
@@ -55,7 +55,7 @@ def headerparserhandler(req):
       req.status = apache.HTTP_UNAUTHORIZED
     return apache.DONE
 
-def approved_user():
+def approved_user(req):
   ec2 = boto3.resource('ec2',AWS_REGION)
   vm = ec2.Instance(EC2_INSTANCE_ID)
 
@@ -88,7 +88,7 @@ def store_to_ssm(access_token):
     Overwrite=True
   )
 
-def jwt_payload(encoded_jwt):
+def jwt_payload(encoded_jwt, req):
   # The x-amzn-oid-data header is a base64-encoded JWT signed by the ALB
   # validating the signature of the JWT means the payload is authentic
   # per http://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html
