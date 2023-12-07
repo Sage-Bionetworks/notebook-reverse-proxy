@@ -99,7 +99,7 @@ def jwt_payload(encoded_jwt):
   decoded_json = json.loads(decoded_jwt_headers)
   kid = decoded_json['kid']
   req.log_error(f"kid: {kid}")
-  
+
   # Step 2: Get the public key from regional endpoint
   pub_key = get_aws_elb_public_key(kid)
   req.log_error(f"pub_key: {pub_key}")
