@@ -9,10 +9,11 @@ RUN apt-get update
 RUN apt-get install -y apache2 apache2-dev curl libapache2-mod-python pip && apt-get clean
 
 # Install Python dependencies
-RUN pip install jwt requests boto3
+RUN pip install pyjwt requests boto3
 
 # Add JWT and instance tag verifying script
 COPY access.py /usr/lib/cgi-bin/access.py
+COPY access_helpers.py /usr/lib/cgi-bin/access_helpers.py
 
 # Add config for local rev proxy to internal port
 COPY ${notebook_type}_proxy.conf /etc/apache2/sites-available/proxy.conf
