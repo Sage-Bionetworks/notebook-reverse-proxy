@@ -33,8 +33,9 @@ def headerparserhandler(req):
     if not AMZN_OIDC_HEADER_NAME in req.headers_in:
         raise RuntimeError(f"Request lacks {AMZN_OIDC_HEADER_NAME} header.")
     jwt_str = req.headers_in[AMZN_OIDC_HEADER_NAME] # proxy.conf ensures this header exists
+    req.log_error(f"jwt_str: {jwt_str}")
     payload = jwt_payload(jwt_str)
-    req.log_error(f"Got JWT payload {payload} . userid: {payload['userid']}")
+    req.log_error(f"userid: {payload['userid']}")
 
     if payload['userid'] == approved_user() and payload['exp'] > time.time():
       store_to_ssm(req.headers_in['x-amzn-oidc-accesstoken'])
@@ -92,18 +93,20 @@ def jwt_payload(encoded_jwt):
   # validating the signature of the JWT means the payload is authentic
   # per http://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html
   # Step 1: Get the key id from JWT headers (the kid field)
-  #encoded_jwt = headers.dict['x-amzn-oidc-data']
   jwt_headers = encoded_jwt.split('.')[0]
 
   decoded_jwt_headers = base64.b64decode(jwt_headers).decode("utf-8")
   decoded_json = json.loads(decoded_jwt_headers)
   kid = decoded_json['kid']
-
+  req.log_error(f"kid: {kid}")
+  
   # Step 2: Get the public key from regional endpoint
   pub_key = get_aws_elb_public_key(kid)
+  req.log_error(f"pub_key: {pub_key}")
 
   # Step 3: Get the payload
-  return jwt.decode(encoded_jwt, pub_key, algorithms=['ES256'])
+  instance = jwt.JWT()
+  return instance.decode(encoded_jwt, pub_key, algorithms=['ES256'])
 
 @functools.lru_cache()
 def get_aws_elb_public_key(key_id):
