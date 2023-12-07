@@ -33,9 +33,14 @@ def headerparserhandler(req):
       req.log_error("Saved access token")
       return apache.OK
     else:
-      return apache.HTTP_UNAUTHORIZED #the userid claim does not match the userid tag
-  except Exception:
+      # the userid claim does not match the userid tag or the JWT is expired
+      req.content_type = "text/plain"
+      req.write("You are not permitted to access this resource.")
+      return apache.HTTP_FORBIDDEN 
+  except Exception as e:
     # if the JWT is missing or payload is invalid
+    req.content_type = "text/plain"
+    req.write(e.message)
     return apache.HTTP_UNAUTHORIZED
 
 def approved_user():
