@@ -66,12 +66,12 @@ def jwt_payload(encoded_jwt, req=None, validate_time_leeway_seconds=0):
   decoded_json = json.loads(decoded_jwt_headers)
   kid = decoded_json['kid']
   if req is not None:
-  	req.log_error(f"kid: {kid}")
+    req.log_error(f"kid: {kid}")
 
   # Step 2: Get the public key from regional endpoint
   pub_key = get_aws_elb_public_key(kid)
   if req is not None:
-  	req.log_error(f"pub_key: {pub_key}")
+    req.log_error(f"pub_key: {pub_key}")
 
   # Step 3: Get the payload
   return jwt.decode(encoded_jwt, pub_key, leeway=validate_time_leeway_seconds, algorithms=['ES256'])
