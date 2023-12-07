@@ -39,15 +39,13 @@ def headerparserhandler(req):
       # the userid claim does not match the userid tag or the JWT is expired
       req.content_type = "text/plain"
       req.write("You are not permitted to access this resource.")
-      req.status = apache.HTTP_FORBIDDEN
-      return apache.DONE
+      return apache.HTTP_FORBIDDEN
   except Exception as e:
     # if the JWT is missing or payload is invalid
-    if hasattr(e, 'message'):
+    if len(e.args)>0:
       req.content_type = "text/plain"
-      req.write(e.message)
-      req.status = apache.HTTP_UNAUTHORIZED
-    return apache.DONE
+      req.write(e.args[0])
+    return apache.HTTP_UNAUTHORIZED
 
 def approved_user():
   ec2 = boto3.resource('ec2',AWS_REGION)
