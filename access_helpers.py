@@ -22,14 +22,13 @@ SSM_KMS_KEY_ALIAS = os.environ.get('KMS_KEY_ALIAS')
 AWS_REGION = os.environ.get('AWS_REGION')
 EC2_INSTANCE_ID = os.environ.get('EC2_INSTANCE_ID')
 
-def approved_user(req):
+def approved_user():
   ec2 = boto3.resource('ec2',AWS_REGION)
   vm = ec2.Instance(EC2_INSTANCE_ID)
 
   for tags in vm.tags:
     if tags["Key"] == 'Protected/AccessApprovedCaller':
       approved_caller = tags["Value"]
-      req.log_error(f"approved_caller: ${approved_caller}")
 
   return approved_caller.split(':')[1] #return userid portion of tag
 
@@ -70,8 +69,6 @@ def jwt_payload(encoded_jwt, req=None, validate_time_leeway_seconds=0):
 
   # Step 2: Get the public key from regional endpoint
   pub_key = get_aws_elb_public_key(kid)
-  if req is not None:
-    req.log_error(f"pub_key: {pub_key}")
 
   # Step 3: Get the payload
   return jwt.decode(encoded_jwt, pub_key, leeway=validate_time_leeway_seconds, algorithms=['ES256'])
