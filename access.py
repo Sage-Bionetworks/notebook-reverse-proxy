@@ -36,7 +36,7 @@ def headerparserhandler(req):
       # the userid claim does not match the userid tag or the JWT is expired
       req.content_type = "text/plain"
       req.write("You are not permitted to access this resource.")
-      return apache.HTTP_FORBIDDEN 
+      return apache.HTTP_FORBIDDEN
   except Exception as e:
     # if the JWT is missing or payload is invalid
     req.content_type = "text/plain"
