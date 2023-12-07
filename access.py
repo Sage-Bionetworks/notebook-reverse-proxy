@@ -26,7 +26,7 @@ def headerparserhandler(req):
 
   try:
     if not AMZN_OIDC_HEADER_NAME in req.headers_in:
-    	raise RuntimeError(f"Request lacks {AMZN_OIDC_HEADER_NAME} header.")
+        raise RuntimeError(f"Request lacks {AMZN_OIDC_HEADER_NAME} header.")
     jwt_str = req.headers_in[AMZN_OIDC_HEADER_NAME] # proxy.conf ensures this header exists
     payload = jwt_payload(jwt_str)
     req.log_error(f"Got JWT payload. userid: {payload['userid']}")
