@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Container startup requires the following environment variables:
-# EC2_INSTANCE_ID
-# AWS_REGION
+# EC2_INSTANCE_ID - ID of the EC2 instance on which the container is running ("i-xxxxxxxxxx")
+# AWS_REGION - AWS Region in which the EC2 instance is running (e.g., "us-east-1")
 # SERVICE_CATALOG_PREFIX - prefix to use for service catalog synapse cred' name in SSM Parameter store
 # SSM_PARAMETER_SUFFIX - suffix for the SSM Parameter name
 # NOTEBOOK_HOST - name of the host running the notebook, as seen on the Docker network

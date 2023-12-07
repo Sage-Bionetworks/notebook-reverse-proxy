@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 ##
-## Expects these envionmental variables
+## Expects these environmen variables:
+## SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME
+## KMS_KEY_ALIAS
 ## AWS_REGION
 ## EC2_INSTANCE_ID
 ##
@@ -17,9 +19,12 @@ import os
 
 from mod_python import apache
 
-ssm_parameter_name_env_var = 'SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME'
-kms_alias_env_var = 'KMS_KEY_ALIAS'
 AMZN_OIDC_HEADER_NAME = 'x-amzn-oidc-data'
+
+SSM_PARAMETER_NAME = os.environ.get('SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME')
+SSM_KMS_KEY_ALIAS = os.environ.get('KMS_KEY_ALIAS')
+AWS_REGION = os.environ.get('AWS_REGION')
+EC2_INSTANCE_ID = os.environ.get('EC2_INSTANCE_ID')
 
 def headerparserhandler(req):
   req.log_error("Entering handler")
@@ -45,7 +50,7 @@ def headerparserhandler(req):
     # if the JWT is missing or payload is invalid
     if len(e.args)>0:
       req.content_type = "text/plain"
-      req.write(e.args[0])
+      req.write(f"{e.args[0]}\n")
       req.status = apache.HTTP_UNAUTHORIZED
     return apache.DONE
 
@@ -66,18 +71,16 @@ def approved_user():
 # not stored as-is in memory
 @functools.lru_cache(maxsize=1)
 def store_to_ssm(access_token):
-  parameter_name = os.environ.get(ssm_parameter_name_env_var)
-  kms_key_alias = os.environ.get(kms_alias_env_var)
-  if not (parameter_name):
+  if not (SSM_PARAMETER_NAME):
     # just exit early if the parameter name to store in SSM is not found
     return
 
   ssm_client = boto3.client('ssm', AWS_REGION)
   kms_client = boto3.client('kms', AWS_REGION)
-  key_id = kms_client.describe_key(KeyId=kms_key_alias)['KeyMetadata']['KeyId']
+  key_id = kms_client.describe_key(KeyId=SSM_KMS_KEY_ALIAS)['KeyMetadata']['KeyId']
 
   ssm_client.put_parameter(
-    Name=parameter_name,
+    Name=SSM_PARAMETER_NAME,
     Type='SecureString',
     Value=access_token,
     KeyId=key_id,
@@ -97,12 +100,12 @@ def jwt_payload(encoded_jwt):
   kid = decoded_json['kid']
 
   # Step 2: Get the public key from regional endpoint
-  pub_key = get_aws_elb_public_key(AWS_REGION, kid)
+  pub_key = get_aws_elb_public_key(kid)
 
   # Step 3: Get the payload
   return jwt.decode(encoded_jwt, pub_key, algorithms=['ES256'])
 
 @functools.lru_cache()
-def get_aws_elb_public_key(AWS_REGION, key_id):
+def get_aws_elb_public_key(key_id):
   url = f'https://public-keys.auth.elb.{AWS_REGION}.amazonaws.com/{key_id}'
   return requests.get(url).text
