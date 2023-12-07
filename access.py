@@ -19,12 +19,15 @@ from mod_python import apache
 
 ssm_parameter_name_env_var = 'SYNAPSE_TOKEN_AWS_SSM_PARAMETER_NAME'
 kms_alias_env_var = 'KMS_KEY_ALIAS'
+AMZN_OIDC_HEADER_NAME = 'x-amzn-oidc-data'
 
 def headerparserhandler(req):
   req.log_error("Entering handler")
 
   try:
-    jwt_str = req.headers_in['x-amzn-oidc-data'] #proxy.conf ensures this header exists
+    if not AMZN_OIDC_HEADER_NAME in req.headers_in:
+    	raise RuntimeError(f"Request lacks {AMZN_OIDC_HEADER_NAME} header.")
+    jwt_str = req.headers_in[AMZN_OIDC_HEADER_NAME] # proxy.conf ensures this header exists
     payload = jwt_payload(jwt_str)
     req.log_error(f"Got JWT payload. userid: {payload['userid']}")
 
@@ -39,8 +42,9 @@ def headerparserhandler(req):
       return apache.HTTP_FORBIDDEN
   except Exception as e:
     # if the JWT is missing or payload is invalid
-    req.content_type = "text/plain"
-    req.write(e.message)
+    if hasattr(e, 'message'):
+      req.content_type = "text/plain"
+      req.write(e.message)
     return apache.HTTP_UNAUTHORIZED
 
 def approved_user():
