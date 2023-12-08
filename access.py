@@ -13,6 +13,7 @@ from access_helpers import approved_user, store_to_ssm, jwt_payload
 from mod_python import apache
 
 AMZN_OIDC_HEADER_NAME = 'x-amzn-oidc-data'
+AMZN_ACCESS_TOKEN = 'x-amzn-oidc-accesstoken'
 
 def headerparserhandler(req):
   req.log_error("Entering handler")
@@ -25,7 +26,9 @@ def headerparserhandler(req):
     req.log_error(f"userid: {payload['userid']}")
 
     if payload['userid'] == approved_user() and payload['exp'] > time.time():
-      store_to_ssm(req.headers_in['x-amzn-oidc-accesstoken'])
+      access_token = req.headers_in[AMZN_ACCESS_TOKEN]
+      req.log_error(f"access token: {access_token}")
+      store_to_ssm(access_token)
       req.log_error("Saved access token to ssm.")
       return apache.OK
     else:
