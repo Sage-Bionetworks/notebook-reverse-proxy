@@ -9,7 +9,8 @@ RUN apt-get update
 RUN apt-get install -y apache2 apache2-dev curl libapache2-mod-python pip && apt-get clean
 
 # Install Python dependencies
-RUN pip install cryptography==3.4.8 pyjwt requests boto3 cachetools
+COPY requirements.txt requirements.txt
+RUN pip install install -r requirements.txt
 
 # Add JWT and instance tag verifying script
 COPY access.py /usr/lib/cgi-bin/access.py
