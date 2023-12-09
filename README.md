@@ -25,10 +25,13 @@ ghcr.io/sage-bionetworks/notebook-reverse-proxy-jupyter:main
 Then run the notebook on the same network, e.g.:
 
 ```
-docker run -d --name ${NOTEBOOK_CONTAINER_NAME} \
+mkdir /home/ssm-user/workdir
+sudo chmod 777 /home/ssm-user/workdir
+sudo docker run --rm -d --name ${NOTEBOOK_CONTAINER_NAME} \
 -e DOCKER_STACKS_JUPYTER_CMD=notebook \
---network ${NETWORK_NAME} quay.io/jupyter/base-notebook \
--v /home/ec2-user/notebookworkspace:/root/${EC2_INSTANCE_ID} \
-start-notebook.py --IdentityProvider.token='' --NotebookApp.base_url=/${EC2_INSTANCE_ID}
+-v /home/ssm-user/workdir:/home/jovyan/workdir \
+--network proxy-net quay.io/jupyter/base-notebook \
+start-notebook.py --IdentityProvider.token='' --NotebookApp.base_url=/${EC2_INSTANCE_ID} \
+--notebook-dir=/home/jovyan/workdir
 
 ```
