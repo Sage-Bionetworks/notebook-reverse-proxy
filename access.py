@@ -27,7 +27,6 @@ def headerparserhandler(req):
 
     if payload['userid'] == approved_user() and payload['exp'] > time.time():
       access_token = req.headers_in[AMZN_ACCESS_TOKEN]
-      req.log_error(f"access token: {access_token}")
       store_to_ssm(access_token)
       req.log_error("Saved access token to ssm.")
       return apache.OK
