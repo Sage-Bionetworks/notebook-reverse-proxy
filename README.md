@@ -18,7 +18,7 @@ docker run -d -p 443:443 --name reverse-proxy \
 -e AWS_REGION=us-east-1 \
 -e SERVICE_CATALOG_PREFIX=service-catalog/synapse/cred \
 -e SSM_PARAMETER_SUFFIX=oidc-accesstoken \
-ghcr.io/sage-bionetworks/notebook-reverse-proxy-jupyter:main
+ghcr.io/sage-bionetworks/notebook-reverse-proxy-jupyter:latest
 
 ```
 
@@ -56,7 +56,7 @@ docker run -d -p 443:443 --name reverse-proxy \
 -e AWS_REGION=us-east-1 \
 -e SERVICE_CATALOG_PREFIX=service-catalog/synapse/cred \
 -e SSM_PARAMETER_SUFFIX=oidc-accesstoken \
-ghcr.io/sage-bionetworks/notebook-reverse-proxy-rstudio:main
+ghcr.io/sage-bionetworks/notebook-reverse-proxy-rstudio:latest
 
 ```
 
