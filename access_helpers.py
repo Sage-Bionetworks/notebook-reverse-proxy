@@ -22,16 +22,20 @@ AWS_REGION = os.environ.get('AWS_REGION')
 EC2_INSTANCE_ID = os.environ.get('EC2_INSTANCE_ID')
 CACHE_TTL_SECONDS = 3600 # one hour
 
+def get_approved_user_from_ec2_instance_tags(tags):
+  for tag in tags:
+    if tag["Key"] == 'Protected/AccessApprovedCaller':
+      approved_caller = tag["Value"]
+
+  return approved_caller.split(':')[1] #return userid portion of tag
+
+
+
 @cachetools.func.ttl_cache(maxsize=1, ttl=CACHE_TTL_SECONDS)
 def approved_user():
   ec2 = boto3.resource('ec2',AWS_REGION)
   vm = ec2.Instance(EC2_INSTANCE_ID)
-
-  for tags in vm.tags:
-    if tags["Key"] == 'Protected/AccessApprovedCaller':
-      approved_caller = tags["Value"]
-
-  return approved_caller.split(':')[1] #return userid portion of tag
+  return get_approved_user_from_ec2_instance_tags(vm.tags)
 
 # taking advantage of cache to avoid re-putting the same access token to
 # SSM Parameter Store.

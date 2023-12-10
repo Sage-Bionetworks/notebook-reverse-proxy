@@ -19,3 +19,7 @@ def test_jwt_payload(mock_get_public_key):
    payload = access_helpers.jwt_payload(encoded_jwt, req=None, validate_time_leeway_seconds=31536000000)
 
    assert payload['userid']=='273960'
+
+def test_get_approved_user_from_ec2_instance_tags():
+   tags = [{"Key":"foo", "Value":"bar"}, {"Key":"Protected/AccessApprovedCaller", "Value":"AROATOOICTTHKNSFVWL5U:273960"}]
+   assert access_helpers.get_approved_user_from_ec2_instance_tags(tags) == "273960"
