@@ -1,7 +1,23 @@
 # notebook-reverse-proxy
 Docker container with Apache reverse proxy for Service Catalog notebook product
 
-### To run a Jupyter notebook:
+This is a component of the Service Catalog notebook product.
+The provsioned product sits behind an AWS ALB which authenticates
+the user, adds an access token as a header, and forwards the traffic
+to the instance, under the URL:
+
+```
+https:<host-name>/<ec2-instance-id>
+```
+
+It's the job of this reverse proxy to:
+- validate the access token;
+- make sure the access token is for the user assigned to the EC2 instance;
+- store the access token in SSM Parameter Store for later use;
+- forward the traffic to the notebook
+
+
+### To run a Jupyter notebook with this reverse proxy:
 
 ```
 export EC2_INSTANCE_ID=...
@@ -38,7 +54,7 @@ start-notebook.py --IdentityProvider.token='' --NotebookApp.base_url=/${EC2_INST
 
 ```
 
-### To run an RStudio notebook:
+### To run an RStudio notebook with this reverse proxy:
 
 
 ```

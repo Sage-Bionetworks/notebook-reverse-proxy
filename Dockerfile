@@ -9,6 +9,8 @@ RUN apt-get update
 RUN apt-get install -y git zip apache2 apache2-dev curl pip && apt-get clean
 
 # patterned after https://github.com/Sage-Bionetworks-IT/packer-rstudio/blob/master/src/playbook.yaml#L76-L91
+#       "The mod_python provided by apt in Ubuntu 22.04 intermittently fails with segmentation faults.
+#       mod_python is only supported from master branch at https://github.com/grisha/mod_python.git"
 ENV MOD_PYTHON_REPO_HASH=9db86bca5106b5cf7ceca7645ec0208446c71e25
 RUN curl -o /archive.zip -L https://github.com/grisha/mod_python/archive/${MOD_PYTHON_REPO_HASH}.zip
 RUN unzip /archive.zip

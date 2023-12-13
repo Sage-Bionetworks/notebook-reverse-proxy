@@ -23,12 +23,6 @@ repos:
     rev: v1.29.0
     hooks:
       - id: yamllint
-  - repo: https://github.com/awslabs/cfn-python-lint
-    rev: v0.72.10
-    hooks:
-      - id: cfn-python-lint
-        files: templates/.*\.(json|yml|yaml)$
-        exclude: templates/.*/lambda-budgets/.*\.(json|yml|yaml)$
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.4.2
     hooks:
