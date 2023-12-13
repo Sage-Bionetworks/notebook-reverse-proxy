@@ -48,7 +48,7 @@ sudo docker run -d --name ${NOTEBOOK_CONTAINER_NAME} \
 --restart unless-stopped \
 -e DOCKER_STACKS_JUPYTER_CMD=notebook \
 -v /home/ssm-user/workdir:/home/jovyan/workdir \
---network proxy-net quay.io/jupyter/base-notebook \
+--network ${NETWORK_NAME} quay.io/jupyter/base-notebook \
 start-notebook.py --IdentityProvider.token='' --NotebookApp.base_url=/${EC2_INSTANCE_ID} \
 --notebook-dir=/home/jovyan/workdir
 
@@ -84,7 +84,7 @@ sudo chmod 777 /home/ssm-user/workdir
 
 sudo docker run -d --name ${NOTEBOOK_CONTAINER_NAME} \
 --restart unless-stopped \
---network proxy-net \
+--network ${NETWORK_NAME} \
 -e DISABLE_AUTH=true \
 -v /home/ssm-user/workdir:/home/rstudio \
 rocker/rstudio
