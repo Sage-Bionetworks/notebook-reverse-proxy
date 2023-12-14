@@ -30,7 +30,6 @@ jobs:
 
 
   docker-deploy-jupyter:
-    if: ${{github.ref == 'refs/heads/main'}}
     needs: [tests]
     uses: "./.github/workflows/docker_build.yml"
     secrets: inherit
@@ -38,7 +37,6 @@ jobs:
       NOTEBOOK_TYPE: jupyter
 
   docker-deploy-rstudio:
-    if: ${{github.ref == 'refs/heads/main'}}
     needs: [tests]
     uses: "./.github/workflows/docker_build.yml"
     secrets: inherit

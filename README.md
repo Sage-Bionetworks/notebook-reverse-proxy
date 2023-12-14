@@ -38,17 +38,23 @@ ghcr.io/sage-bionetworks/notebook-reverse-proxy-jupyter:latest
 
 ```
 
-Then run the notebook on the same network:
+Then run the notebook on the same network. For example:
 
 ```
-mkdir /home/ssm-user/workdir
-sudo chmod 777 /home/ssm-user/workdir
+# this is just an example user name, though it's the one Service Catalog uses today:
+export HOME=/home/ssm-user
+
+# The following should be customized, e.g., with an up-to-date version
+export DOCKER_IMAGE=quay.io/jupyter/base-notebook:python-3.11
+
+mkdir $HOME/workdir
+sudo chmod 777 $HOME/workdir
 
 sudo docker run -d --name ${NOTEBOOK_CONTAINER_NAME} \
 --restart unless-stopped \
 -e DOCKER_STACKS_JUPYTER_CMD=notebook \
--v /home/ssm-user/workdir:/home/jovyan/workdir \
---network ${NETWORK_NAME} quay.io/jupyter/base-notebook \
+-v $HOME/workdir:/home/jovyan/workdir \
+--network ${NETWORK_NAME} ${DOCKER_IMAGE} \
 start-notebook.py --IdentityProvider.token='' --NotebookApp.base_url=/${EC2_INSTANCE_ID} \
 --notebook-dir=/home/jovyan/workdir
 
@@ -76,17 +82,24 @@ ghcr.io/sage-bionetworks/notebook-reverse-proxy-rstudio:latest
 
 ```
 
-Then run the notebook on the same network:
+Then run the notebook on the same network. For example:
 
 ```
-mkdir /home/ssm-user/workdir
-sudo chmod 777 /home/ssm-user/workdir
+# this is just an example user name, though it's the one Service Catalog uses today:
+export HOME=/home/ssm-user
+
+# The following should be customized, e.g., with an up-to-date version
+export DOCKER_IMAGE=rocker/rstudio:4.3.2
+
+mkdir $HOME/workdir
+sudo chmod 777 $HOME/workdir
+
 
 sudo docker run -d --name ${NOTEBOOK_CONTAINER_NAME} \
 --restart unless-stopped \
 --network ${NETWORK_NAME} \
 -e DISABLE_AUTH=true \
 -v /home/ssm-user/workdir:/home/rstudio \
-rocker/rstudio
+${DOCKER_IMAGE}
 
 ```
