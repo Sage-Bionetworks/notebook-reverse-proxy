@@ -3,7 +3,7 @@ name: Create and publish a Docker image
 on:
   push:
     branches:
-      - 'main'
+      - '*'
     tags:
       - '*'
   pull_request:
@@ -29,14 +29,14 @@ jobs:
         run: python -m pytest tests/ -s -v
 
 
-  docker-deploy-jupyter:
+  docker-build-jupyter:
     needs: [tests]
     uses: "./.github/workflows/docker_build.yml"
     secrets: inherit
     with:
       NOTEBOOK_TYPE: jupyter
 
-  docker-deploy-rstudio:
+  docker-build-rstudio:
     needs: [tests]
     uses: "./.github/workflows/docker_build.yml"
     secrets: inherit
