@@ -41,6 +41,8 @@ jobs:
           context: .
           build-args: notebook_type=${{ inputs.NOTEBOOK_TYPE }}
           # Note we only publish containers on pushes to the main branch
-          push: ${{ github.event_name != 'pull_request' }} && ${{github.ref == 'refs/heads/main'}}
+          push: |
+            ${{ github.event_name != 'pull_request' }} &&
+            ${{github.ref == 'refs/heads/main'}}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
